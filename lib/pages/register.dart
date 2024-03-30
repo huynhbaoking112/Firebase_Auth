@@ -1,45 +1,51 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MyLogin extends StatefulWidget {
+class MyRegister extends StatelessWidget {
+  final Function changeLogin;
 
-  final Function changeRegis;
+  MyRegister({super.key, required this.changeLogin});
 
-  const MyLogin({super.key, required this.changeRegis});
-
-  @override
-  State<MyLogin> createState() => _MyLoginState();
-}
-
-class _MyLoginState extends State<MyLogin> {
   //text controller
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordConfirmController = TextEditingController();
 
-  Future signIn() async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim());
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+  void signUp(BuildContext context) async {
+    if (checkMatch()) {
+      try {
+        final credential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          print('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          print('The account already exists for that email.');
+        }
+      } catch (e) {
+        print(e);
       }
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('The password and confirm password is not match'),
+        ),
+      );
     }
   }
 
-
-
-  @override
-  void dispose(){
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-
+  bool checkMatch() {
+    if (passwordController.text.trim() ==
+        passwordConfirmController.text.trim()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override
@@ -120,10 +126,30 @@ class _MyLoginState extends State<MyLogin> {
                 height: 10,
               ),
 
+              //Password Field
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white70,
+                    border: Border.all(width: 2, color: Colors.white)),
+                child: TextField(
+                  controller: passwordConfirmController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: 'Confirm Password'),
+                ),
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
               //SignIn button
               GestureDetector(
-                onTap: (){
-                  signIn();
+                onTap: () {
+                  signUp(context);
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -134,7 +160,7 @@ class _MyLoginState extends State<MyLogin> {
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(vertical: 15),
                   child: const Text(
-                    'Sign In',
+                    'Sign Up',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
@@ -148,21 +174,22 @@ class _MyLoginState extends State<MyLogin> {
               ),
 
               //Register now
-               Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Not a member? ',
+                    'Have a account? ',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
                     onTap: () {
-                      widget.changeRegis();
+                      changeLogin();
                     },
-                    child:const Text(
-                      'Register now',
+                    child: const Text(
+                      'Login now',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent),
                     ),
                   )
                 ],
@@ -172,5 +199,6 @@ class _MyLoginState extends State<MyLogin> {
         ),
       ),
     );
+    ;
   }
 }
