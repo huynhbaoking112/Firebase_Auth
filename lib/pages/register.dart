@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,13 +14,17 @@ class MyRegister extends StatelessWidget {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordConfirmController = TextEditingController();
+  TextEditingController firstNameConfirmController = TextEditingController();
+  TextEditingController lastNameConfirmController = TextEditingController();
+  TextEditingController ageConfirmController = TextEditingController();
 
-  void signUp(BuildContext context) async {
+  Future signUp(BuildContext context) async {
     if (checkMatch()) {
       try {
         final credential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
+                addUser(firstNameConfirmController.text, lastNameConfirmController.text, int.parse(ageConfirmController.text), emailController.text);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           print('The password provided is too weak.');
@@ -37,6 +42,16 @@ class MyRegister extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Future addUser(String firstName, String lastName, int age, String email) async {
+      await FirebaseFirestore.instance.collection('users').add({
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
+        "age": age
+      });
+      
   }
 
   bool checkMatch() {
@@ -106,6 +121,66 @@ class MyRegister extends StatelessWidget {
                 height: 10,
               ),
 
+
+              //first Field
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white70,
+                    border: Border.all(width: 2, color: Colors.white)),
+                child: TextField(
+                  controller: firstNameConfirmController,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: 'FirstName'),
+                ),
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
+              //lastname Field
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white70,
+                    border: Border.all(width: 2, color: Colors.white)),
+                child: TextField(
+                  controller: lastNameConfirmController,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: 'Lastname'),
+                ),
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
+              //age Field
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white70,
+                    border: Border.all(width: 2, color: Colors.white)),
+                child: TextField(
+                  controller: ageConfirmController,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: 'age'),
+                ),
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
+
+
               //Password Field
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 20),
@@ -141,6 +216,8 @@ class MyRegister extends StatelessWidget {
                       border: InputBorder.none, hintText: 'Confirm Password'),
                 ),
               ),
+
+              
 
               const SizedBox(
                 height: 10,
@@ -201,4 +278,4 @@ class MyRegister extends StatelessWidget {
     );
     ;
   }
-}
+} 

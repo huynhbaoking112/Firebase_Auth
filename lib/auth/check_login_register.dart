@@ -14,7 +14,7 @@ class CheckLogRegis extends StatefulWidget {
 
 class _CheckLogRegisState extends State<CheckLogRegis> {
 
-  bool isLogin = true;
+  bool isLogin = false;
 
   void change(){
     setState(() {
