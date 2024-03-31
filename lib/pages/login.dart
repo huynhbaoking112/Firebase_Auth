@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_application_1/pages/forgot_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyLogin extends StatefulWidget {
@@ -146,6 +147,22 @@ class _MyLoginState extends State<MyLogin> {
               const SizedBox(
                 height: 20,
               ),
+
+
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(context,MaterialPageRoute(builder: (context) => ForgotPage(),));
+                },
+                child: Text('Forgot Password?' ,style: TextStyle(
+                  fontWeight: FontWeight.w500
+                ),),
+              ),
+              
+              const SizedBox(
+                height: 20,
+              ),
+
+
 
               //Register now
                Row(
